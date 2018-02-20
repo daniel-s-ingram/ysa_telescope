@@ -1,0 +1,40 @@
+﻿# ASCII
+# Creo  TM  3.0  (c) 2017 by PTC Inc.  All Rights Reserved.
+# DECLARATION_FILE 0 cad
+#
+EXPORT_3D_FORCE_DEFAULT_NAMING  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_OUT_EXTEND_SURFACE  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_OUT_FORCE_SURF_NORMALS  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_OUT_SURFACE_DEVIATION  ( -Aw )
+{
+        ( -Fs )
+}
+INTF_OUT_AS_BEZIER  ( -Aw )
+{
+   YES
+   NO
+}
+INTF_OUT_MAX_BSPL_DEGREE  ( -Aw )
+{
+        ( -Fs )
+}
+STEP_EXPORT_FORMAT  ( -Aw )
+{
+   AP203_IS
+   AP214_CD
+   AP202_IS
+   203_IS_EXT
+   AP214_DIS
+}
