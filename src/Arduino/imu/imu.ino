@@ -30,7 +30,7 @@ byte acc_address[] = {ACCEL_XOUT, ACCEL_YOUT, ACCEL_ZOUT};
 byte gyro_address[] = {GYRO_XOUT, GYRO_YOUT, GYRO_ZOUT};
 byte mag_address[] = {MAG_XOUT, MAG_YOUT, MAG_ZOUT};
 
-double roll, pitch, rollRate, pitchRate, rollAngle, pitchAngle, dt, rollGyro;
+double roll, pitch, yaw, rollRate, pitchRate, yawRate, rollAngle, pitchAngle, yawAngle, dt;
 
 void setup() 
 {
@@ -62,17 +62,20 @@ void loop()
   //Convert accelerometer data to degrees and gyroscope data to degrees/second
   pitch = atan2(-a[1], a[2]); 
   roll = atan2(-a[0], a[2]);
+  yaw = atan2(m[1], m[0]);
   pitchRate = g[0] * gyro_deg2rad;
   rollRate = g[1] * gyro_deg2rad;
+  yawRate = g[2] * gyro_deg2rad;
   
   //Complementary filter
   rollAngle = 0.99 * (rollAngle + rollRate * (micros() - dt) / 1000000.0) + 0.01 * roll;
   pitchAngle = 0.98 * (pitchAngle + pitchRate * (micros() - dt) / 1000000.0) + 0.02 * pitch;
+  yawAngle = 0.99 * (yawAngle + yawRate * (micros() - dt) / 1000000.0) + 0.01 * yaw;
   
   dt = micros();
 
-  Serial.print(m[0]); Serial.print(" "); Serial.print(m[1]); Serial.print(" "); Serial.println(m[2]);
-  //Serial.print(rollAngle); Serial.print(" "); Serial.println(pitchAngle);
+  //Serial.print(m[0]); Serial.print(" "); Serial.print(m[1]); Serial.print(" "); Serial.println(m[2]);
+  Serial.print(rollAngle); Serial.print(" "); Serial.print(pitchAngle); Serial.print(" "); Serial.println(yawAngle);
 }
 int16_t read(byte deviceAddress, byte valueAddress, int bytesToRead)
 {
@@ -104,7 +107,7 @@ void magRead()
   {
     m[i] = read(AK8963_ADDRESS, mag_address[i], 2);
   }
-  read(AK8963_ADDRESS, 0x09, 1);
+  read(AK8963_ADDRESS, 0x09, 1); //This register HAS to be read
 }
 
 void write(byte deviceAddress, byte valueAddress, byte data)
