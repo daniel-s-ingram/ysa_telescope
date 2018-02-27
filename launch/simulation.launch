@@ -2,16 +2,26 @@
 
 <launch>
 
-  <param name="robot_description" command="$(find xacro)/xacro '$(find ysa_telescope)/urdf/model.urdf.xacro'" />
+	<rosparam file = "$(find ysa_telescope)/config/controller.yaml" command = "load"/>
 
-  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-    args="-urdf -model model -param robot_description"/>
+	<param name="robot_description" command="$(find xacro)/xacro '$(find ysa_telescope)/urdf/model.urdf.xacro'" />
 
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find ysa_telescope)/world/empty.world"/>
-    <arg name="paused" value="true"/>
-  </include>
+	<node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+		args="-urdf -model model -param robot_description"/>
 
-  <!--include file="$(find roboarm)/launch/roboarm_control.launch"/-->
+	<node name = "robot_state_publisher" pkg = "robot_state_publisher" type = "robot_state_publisher"
+		respawn = "false" output = "screen">
+		<remap from = "/joint_states" to = "/model/joint_states"/>
+	</node>
+
+	<node name = "controller_spawner" pkg = "controller_manager" type = "spawner" respawn = "false"
+		output = "screen" ns = "/model" args = "joint_state_controller pitch_controller yaw_controller"/>
+
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<arg name="world_name" value="$(find ysa_telescope)/world/empty.world"/>
+		<arg name="paused" value="true"/>
+	</include>
+
+	<!--include file="$(find roboarm)/launch/roboarm_control.launch"/-->
 
 </launch>
