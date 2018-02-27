@@ -13,7 +13,7 @@
 	<xacro:property name = "elbow_mass" value = "0.5"/>
 	<xacro:property name = "elbow_width" value = "0.02"/>
 	<xacro:property name = "elbow_height" value = "0.05"/>
-	<xacro:property name = "elbow_length" value = "0.10"/>
+	<xacro:property name = "elbow_length" value = "0.15"/>
 
 
 
@@ -87,31 +87,39 @@
 			</inertial>
 
 		<visual name = "elbow_link_visual">
-			<origin xyz = "${base_radius} 0 ${-mount_length}" />
+			<origin xyz = "${-mount_width/2} ${mount_length} 0" />
 			<geometry> 
 				<box size = "${elbow_width} ${elbow_length} ${elbow_height}"/>
 			</geometry>
 		</visual>
 
-		<visual name = "second_elbow_link">
-			<origin xyz = "${base_radius} ${base_radius} ${-mount_height}"/>
-			<geometry>
+		<visual name = "second_elbow_link_visual">
+			<origin xyz = "${-0.5*elbow_length} ${elbow_length - elbow_width} 0" rpy = "0 0 ${-pi/2}"/>
+			<geometry> 
 				<box size = "${elbow_width} ${elbow_length} ${elbow_height}"/>
 			</geometry>
 		</visual>
-		
-		<collision name = "elbow_link_collision">
-			<origin xyz = "${base_radius} ${base_radius} ${-mount_height}"/>
-			<geometry>
+
+		<collision name = "elbow_link_collsion">
+			<origin xyz = "${-mount_width/2} ${mount_length} 0" />
+			<geometry> 
 				<box size = "${elbow_width} ${elbow_length} ${elbow_height}"/>
 			</geometry>
 		</collision>
+
+		<collision name = "second_elbow_link_collision">
+			<origin xyz = "${-0.5*elbow_length} ${elbow_length - elbow_width} 0" rpy = "0 0 ${-pi/2}"/>
+			<geometry> 
+				<box size = "${elbow_width} ${elbow_length} ${elbow_height}"/>
+			</geometry>
+		</collision>
+
 	</link>
 
 	<joint name = "pitch_joint" type = "revolute">
 		<parent link = "mount_link" />
 		<child link = "elbow_link" />
-		<origin xyz = "${base_radius} ${base_radius} ${-mount_length}"/>
+		<origin xyz = "${base_radius} 0 ${-mount_height+elbow_height/2+base_height/2}" rpy="0 0 0"/>
 		<axis xyz = "1 0 0" />
 		<limit lower="${-pi/4}" upper="${pi/4}" effort="1000.0" velocity="10.0"/>
 	</joint>
@@ -127,4 +135,38 @@
 		<child link="base_link"/>
 		<origin xyz = "0 0 1" rpy = "0 0 0"/>
 	</joint>
+
+	<transmission name="pitch_transmission">
+		<type>transmission_interface/SimpleTransmission</type>
+		
+		<joint name="pitch_joint">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+		</joint>
+
+		<actuator name="pitch_motor">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<transmission name="yaw_transmission">
+		<type>transmission_interface/SimpleTransmission</type>
+		
+		<joint name="yaw_joint">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+		</joint>
+
+		<actuator name="yaw_motor">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<gazebo>
+		<static>false</static>
+		<plugin name = "gazebo_ros_control" filename = "libgazebo_ros_control.so">
+			<robotNamespace>/model</robotNamespace>
+		</plugin>
+	</gazebo>
+
 </robot>
