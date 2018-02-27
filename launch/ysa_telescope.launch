@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <launch>
-	<node name = "mpu9255_reader" 
+	<!--node name = "mpu9255_reader" 
                pkg = "ysa_telescope" 
               type = "i2c-mpu9255-reader.py"
             output = "screen" />
@@ -19,6 +19,11 @@
 	<node name = "servo_controller"
                pkg = "ysa_telescope"
               type = "servo-controller.py"
-            output = "screen" /> 
+            output = "screen" /--> 
+
+  <node name = "mpu9255_reader"
+        pkg = "ysa_telescope"
+        type = "spi_mpu9255_reader"
+        output = "screen" />
 
 </launch>
