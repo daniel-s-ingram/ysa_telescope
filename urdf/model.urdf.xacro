@@ -15,6 +15,9 @@
 	<xacro:property name = "elbow_height" value = "0.05"/>
 	<xacro:property name = "elbow_length" value = "0.15"/>
 
+	<xacro:property name = "scope_mass" value = "0.1"/>
+	<xacro:property name = "scope_length" value = "0.1"/>
+	<xacro:property name = "scope_radius" value = "0.015"/>
 
 
 	<link name = "world"/>
@@ -116,6 +119,42 @@
 
 	</link>
 
+	<link name = "scope_link">
+		<inertial>
+			<mass value = "${scope_mass}"/>
+				<origin xyz = "${mount_length} 0 0 "/>
+			<inertia ixx = "0.0"
+					 ixy = "0.0"
+					 ixz = "0.0"
+					 iyy = "0.0"
+					 iyz = "0.0"
+					 izz = "0.0"/>
+			</inertial>
+
+		<visual name = "scope_link_visual">
+			<origin xyz = "${-mount_width/2} -${mount_length-mount_width} 0" rpy = "${pi/2} 0 0" />
+			<geometry> 
+				<cylinder length = "${scope_length}" radius = "${scope_radius}"/>
+			</geometry>
+		</visual>
+
+		<collision name = "scope_link_collision">
+			<origin xyz = "${-mount_width/2} -${mount_length-mount_width} 0" rpy = "${pi/2} 0 0" />
+			<geometry> 
+				<cylinder length = "${scope_length}" radius = "${scope_radius}"/>
+			</geometry>
+		</collision>
+	</link>
+
+
+	<joint name = "roll_joint" type = "revolute">
+		<parent link = "elbow_link" />
+		<child link = "scope_link" />
+		<origin xyz = "${-base_radius} ${base_radius} 0" rpy="0 0 0"/>
+		<axis xyz = "0 1 1" />
+		<limit lower="${-pi/4}" upper="${pi/4}" effort="1000.0" velocity="10.0"/>
+	</joint>
+
 	<joint name = "pitch_joint" type = "revolute">
 		<parent link = "mount_link" />
 		<child link = "elbow_link" />
@@ -157,6 +196,19 @@
 		</joint>
 
 		<actuator name="yaw_motor">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<transmission name="roll_transmission">
+		<type>transmission_interface/SimpleTransmission</type>
+		
+		<joint name="roll_joint">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+		</joint>
+
+		<actuator name="roll_motor">
 			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
 			<mechanicalReduction>1</mechanicalReduction>
 		</actuator>
