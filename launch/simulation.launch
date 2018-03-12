@@ -22,6 +22,8 @@
 		<arg name="paused" value="true"/>
 	</include>
 
+	<node name="simulation_controller" pkg="ysa_telescope" type="simulation.py" output="screen"/>
+
 	<!--include file="$(find roboarm)/launch/roboarm_control.launch"/-->
 
 </launch>
