@@ -16,8 +16,8 @@
 	<xacro:property name = "elbow_length" value = "0.15"/>
 
 	<xacro:property name = "scope_mass" value = "0.1"/>
-	<xacro:property name = "scope_length" value = "0.1"/>
-	<xacro:property name = "scope_radius" value = "0.015"/>
+	<xacro:property name = "scope_length" value = "0.15"/>
+	<xacro:property name = "scope_radius" value = "0.02"/>
 
 	<link name = "world"/>
 	<!--link name = "dummy_yaw_link">
@@ -110,7 +110,7 @@
 					 izz = "0.0"/>
 			</inertial>
 
-		<!--visual name = "elbow_link_visual">
+		<visual name = "elbow_link_visual">
 			<origin xyz = "${-mount_width/2} ${mount_length} 0" />
 			<geometry> 
 				<box size = "${elbow_width} ${elbow_length} ${elbow_height}"/>
@@ -122,14 +122,14 @@
 			<geometry> 
 				<box size = "${elbow_width} ${elbow_length} ${elbow_height}"/>
 			</geometry>
-		</visual-->
+		</visual>
 
-		<visual name = "elbow_link_visual">
+		<!--visual name = "elbow_link_visual">
 			<origin xyz = "${-mount_width/2} ${mount_length} 0" rpy="${pi} ${-pi/2} ${pi}"/>
 			<geometry> 
 				<mesh filename="package://ysa_telescope/mesh/scope_arms_printable.STL" scale="0.001 0.001 0.001"/>
 			</geometry>
-		</visual>
+		</visual-->
 
 		<collision name = "elbow_link_collsion">
 			<origin xyz = "${-mount_width/2} ${mount_length} 0" />
@@ -150,7 +150,7 @@
 	<link name = "scope_link">
 		<inertial>
 			<mass value = "${scope_mass}"/>
-				<origin xyz = "${mount_length} 0 0 "/>
+			<origin xyz = "${mount_length} 0 0 "/>
 			<inertia ixx = "0.0"
 					 ixy = "0.0"
 					 ixz = "0.0"
@@ -160,14 +160,14 @@
 			</inertial>
 
 		<visual name = "scope_link_visual">
-			<origin xyz = "${-mount_width/2} -${mount_length-mount_width} 0" rpy = "${pi/2} 0 0" />
+			<origin xyz = "0 ${-scope_length/2} 0" rpy = "${pi/2} 0 0" />
 			<geometry> 
 				<cylinder length = "${scope_length}" radius = "${scope_radius}"/>
 			</geometry>
 		</visual>
 
 		<collision name = "scope_link_collision">
-			<origin xyz = "${-mount_width/2} -${mount_length-mount_width} 0" rpy = "${pi/2} 0 0" />
+			<origin xyz = "0 ${-scope_length/2} 0" rpy = "${pi/2} 0 0" />
 			<geometry> 
 				<cylinder length = "${scope_length}" radius = "${scope_radius}"/>
 			</geometry>
@@ -195,8 +195,8 @@
 	<joint name = "roll_joint" type = "revolute">
 		<parent link = "elbow_link" />
 		<child link = "scope_link" />
-		<origin xyz = "${-base_radius} ${base_radius} 0" rpy="0 0 0"/>
-		<axis xyz = "0 1 1" />
+		<origin xyz = "${-base_radius} ${elbow_length-elbow_width-mount_width/2} 0" rpy="0 0 0"/>
+		<axis xyz = "0 -1 0" />
 		<limit lower="${-pi/4}" upper="${pi/4}" effort="1000.0" velocity="10.0"/>
 	</joint>
 
@@ -212,14 +212,6 @@
 		<parent link = "base_link" />
 		<child link = "mount_link" />
 		<axis xyz = "0 0 1" />
-	</joint>
-
-	<joint name = "pitch_joint" type = "revolute">
-		<parent link = "mount_link" />
-		<child link = "elbow_link" />
-		<origin xyz = "${base_radius} 0 ${-mount_height+elbow_height/2+base_height/2}" rpy="0 0 0"/>
-		<axis xyz = "1 0 0" />
-		<limit lower="${-pi/4}" upper="${pi/4}" effort="1000.0" velocity="10.0"/>
 	</joint>
 
 	<transmission name="pitch_transmission">
@@ -243,6 +235,19 @@
 		</joint>
 
 		<actuator name="yaw_motor">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+	</transmission>
+
+	<transmission name="roll_transmission">
+		<type>transmission_interface/SimpleTransmission</type>
+		
+		<joint name="roll_joint">
+			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+		</joint>
+
+		<actuator name="roll_motor">
 			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
 			<mechanicalReduction>1</mechanicalReduction>
 		</actuator>
