@@ -15,13 +15,15 @@
 	</node>
 
 	<node name = "controller_spawner" pkg = "controller_manager" type = "spawner" respawn = "false"
-		output = "screen" ns = "/model" args = "joint_state_controller pitch_controller yaw_controller"/>
+		output = "screen" ns = "/model" args = "joint_state_controller 
+												pitch_controller 
+												yaw_controller
+												roll_controller"/>
 
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
 		<arg name="world_name" value="$(find ysa_telescope)/world/empty.world"/>
-		<arg name="paused" value="true"/>
 	</include>
 
-	<!--include file="$(find roboarm)/launch/roboarm_control.launch"/-->
+	<node name="simulation_controller" pkg="ysa_telescope" type="simulation.py" output="screen"/>
 
 </launch>
